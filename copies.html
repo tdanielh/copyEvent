@@ -1,0 +1,103 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-firestore.js"></script>
+    <script>
+        var firebaseConfig = {
+    apiKey: "AIzaSyBGbQ0PfHQpz6skh1-4WzrG69NgkJp4duQ",
+    authDomain: "copy-410ff.firebaseapp.com",
+    databaseURL: "https://copy-410ff.firebaseio.com",
+    projectId: "copy-410ff",
+    storageBucket: "",
+    messagingSenderId: "1042624515941",
+    appId: "1:1042624515941:web:358c36d2ef283550"
+  };
+  // Initialize Firebase
+  app = firebase.initializeApp(firebaseConfig);
+db = firebase.firestore(app);
+
+  var copiesRef = db.collection('copies');
+  
+  
+  copiesRef
+  .orderBy('time', 'desc')
+  .onSnapshot(function(querySnapshot) {
+      var copiesContainer = document.querySelector('#copiesContainer');
+      copiesContainer.innerHTML = '';
+    querySnapshot.forEach(function(doc){
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.appendChild(document.createTextNode(doc.id))
+        tr.appendChild(td);
+        var object = doc.data();
+        var arr = [];
+        arr['id'] = doc.id;
+        for (var property in object) {
+            var td = document.createElement('td');
+            if (object.hasOwnProperty(property)) {
+                if(property == 'time'){
+
+                    date = new Date(object[property]);
+                    var month = date.getMonth()+1;
+                    var hours = ('0'+date.getHours()).slice(-2);
+                    var minutes = ('0'+date.getMinutes()).slice(-2);
+                    var seconds = ('0'+date.getSeconds()).slice(-2);
+                    td.appendChild(document.createTextNode
+                    (date.getDate()+'-'+month +'-'+date.getFullYear()+' '+hours+':'+minutes+':'+seconds));
+                } else {
+                    td.appendChild(document.createTextNode(object[property]));
+                }
+                arr[property] = object[property];
+            } else {
+                td.appendChild(document.createTextNode(''));
+                arr[property] = '';
+            }
+            tr.appendChild(td);         
+        }
+        var td = document.createElement('td');
+        a = document.createElement('a');
+        a.href =  'snapshots/'+doc.id+'.html'; // Insted of calling        setAttribute 
+        a.target = '_blank';
+        a.innerHTML = "Snapshot" // <a>INNER_TEXT</a>
+        td.appendChild(a)
+        tr.appendChild(td);
+        copiesContainer.appendChild(tr);
+    })
+
+    
+    
+    
+  
+  });
+</script>
+<style>
+    table{
+        border-spacing: 5px;
+    }
+
+    #copiesContainer td {
+        border-bottom: 1px solid black;
+    }
+</style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Text</th>
+                <th>Time</th>
+                <th>snapshot</th>
+            </tr>
+        </thead>
+        <tbody id="copiesContainer">
+
+        </tbody>
+    </table>
+</body>
+</html>
